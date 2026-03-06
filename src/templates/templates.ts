@@ -1,5 +1,5 @@
 import type { PaginationOptions } from '../common/interfaces';
-import { getPaginationQueryProperties } from '../common/utils/get-pagination-query-properties';
+import { buildPaginationQuery } from '../common/utils/build-pagination-query';
 import { parseTemplateToApiOptions } from '../common/utils/parse-template-to-api-options';
 import type { Resend } from '../resend';
 import { ChainableTemplateResult } from './chainable-template-result';
@@ -89,9 +89,11 @@ export class Templates {
   }
 
   async list(options: PaginationOptions = {}): Promise<ListTemplatesResponse> {
-    return this.resend.get<ListTemplatesResponseSuccess>(
-      `/templates${getPaginationQueryProperties(options)}`,
-    );
+    const queryString = buildPaginationQuery(options);
+    const templateRoute = queryString
+      ? `/templates?${queryString}`
+      : '/templates';
+    return this.resend.get<ListTemplatesResponseSuccess>(templateRoute);
   }
 
   duplicate(
